@@ -5,5 +5,8 @@ python:
 services:
   - docker
 
+before_install:
+  - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+
 script:
-  - docker compose run app sh -c "python manage.py test && flake8"
+  - docker compose run --rm app sh -c "python manage.py test && flake8"
