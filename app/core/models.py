@@ -9,8 +9,20 @@ from django.contrib.auth.models import (
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, *args, **kwargs):
         """Creates and saves a new user"""
-        user = self.model(email=email, *args, **kwargs)
+        if not email:
+            raise ValueError("Users must have an email address")
+
+        user = self.model(email=self.normalize_email(email), *args, **kwargs)
         user.set_password(password)
+        user.save(using=self._db)
+
+        return user
+
+    def create_superuser(self, email, password):
+        """Creates and saves a new superuser"""
+        user = self.create_user(email, password)
+        user.is_staff = True
+        user.is_superuser = True
         user.save(using=self._db)
 
         return user
